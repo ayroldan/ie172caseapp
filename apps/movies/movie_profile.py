@@ -285,4 +285,21 @@ def loadmoviedetails(timestamp, to_load, search):
 
     else:
         raise PreventUpdate
+        
 
+@app.callback(
+    [
+        Output('movieprof_submitbtn', 'color'),
+        Output('movieprof_submitbtn', 'children')
+    ],
+        Input('movieprof_removerecord', 'value')
+)
+def changebuttoncolor(removerecord):
+    if bool(removerecord):
+        color = 'danger'
+        children = "Delete Record"
+
+        return [color, children]
+
+    else:
+        raise PreventUpdate
