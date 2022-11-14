@@ -302,4 +302,7 @@ def changebuttoncolor(removerecord):
         return [color, children]
 
     else:
-        raise PreventUpdate
+        color = 'secondary'
+        children = "Submit"
+
+        return [color, children]
