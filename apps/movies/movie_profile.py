@@ -86,8 +86,8 @@ layout = html.Div(
         dbc.Button('Save', color="secondary", id='movieprof_submitbtn'),
         dbc.Modal(
             [
-                dbc.ModalHeader(dbc.ModalTitle("Saving Progress")),
-                dbc.ModalBody("temp message", id='movieprof_feedback_message'),
+                dbc.ModalHeader(dbc.ModalTitle("", id='movieprof_feedback_header')),
+                dbc.ModalBody("", id='movieprof_feedback_message'),
                 dbc.ModalFooter(
                     dbc.Button(
                         "Okay", id="movieprof_closebtn", className="ms-auto", n_clicks=0
@@ -99,6 +99,7 @@ layout = html.Div(
         ),
     ]
 )
+
 
 
 @app.callback(
@@ -114,7 +115,6 @@ layout = html.Div(
         State('url', 'search')
     ]
 )
-
 def movieprof_loaddropdown(pathname, search):
 
     if pathname == '/movies/movie_profile':
@@ -141,9 +141,11 @@ def movieprof_loaddropdown(pathname, search):
     return [genre_opts, to_load, removerecord_div]
 
 
+
 @app.callback(
     [
         Output("movieprof_modal", "is_open"),
+        Output("movieprof_feedback_header", "children"),
         Output("movieprof_feedback_message", "children"),
         Output("movieprof_closebtn", "href")
     ],
@@ -159,7 +161,6 @@ def movieprof_loaddropdown(pathname, search):
         State('movieprof_removerecord', 'value')
     ]
 )
-
 def movieprof_submitprocess(submitbtn, closebtn,
                             
                             title, releasedate, genre,
@@ -168,6 +169,7 @@ def movieprof_submitprocess(submitbtn, closebtn,
     if ctx.triggered:
         eventid=ctx.triggered[0]['prop_id'].split(".")[0]
         openmodal = False
+        feedbackheader = ''
         feedbackmessage = ''
         okay_href = None 
     else:
@@ -183,9 +185,11 @@ def movieprof_submitprocess(submitbtn, closebtn,
         ]
 
         if not all(inputs):
+            feedbackheader = 'Saving Progress'
             feedbackmessage = "Please supply all inputs."
         
         elif len(title)>256:
+            feedbackheader = 'Saving Progress'
             feedbackmessage = "Title is too long (length>256)."
         
         else:
@@ -205,6 +209,7 @@ def movieprof_submitprocess(submitbtn, closebtn,
                 values = [title, genre, releasedate, False]
                 db.modifydatabase(sqlcode, values)
                 
+                feedbackheader = 'Save Success'
                 feedbackmessage = "Movie has been saved."
                 okay_href = '/movies'
             
@@ -227,6 +232,7 @@ def movieprof_submitprocess(submitbtn, closebtn,
                 values = [title, genre, releasedate, to_delete, movieid]
                 db.modifydatabase(sqlcode, values)
 
+                feedbackheader = 'Update Success'
                 feedbackmessage = "Movie has been updated."
                 okay_href = '/movies'
 
@@ -239,7 +245,8 @@ def movieprof_submitprocess(submitbtn, closebtn,
     else:
         raise PreventUpdate
     
-    return [openmodal, feedbackmessage, okay_href]
+    return [openmodal, feedbackheader, feedbackmessage, okay_href]
+
 
 
 @app.callback(
